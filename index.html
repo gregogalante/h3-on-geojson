@@ -1,0 +1,38 @@
+<!-- THIS IS AN HTML PAGE THAT WILL SHOW A GEOJSON ON .geojson_h3_hexes.json IN A OPENSTREETMAP MAP -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GeoJSON Viewer</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+      #map { height: 100vh; }
+      #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; font-size: 2em; }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="loading">Loading...</div>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+      const _ = async () => {
+        const map = L.map('map').setView([40.7128, -74.0060], 10)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+        }).addTo(map)
+
+        const geojsonResponse = await fetch('./geojson_h3_hexes.json')
+        const geojson = await geojsonResponse.json()
+        console.log(geojson)
+
+        const geojsonLayer = L.geoJSON(geojson).addTo(map)
+        map.fitBounds(geojsonLayer.getBounds())
+
+        document.getElementById('loading').style.display = 'none'
+      }
+      _()
+    </script>
+  </body>
+</html>
